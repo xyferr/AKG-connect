@@ -38,21 +38,40 @@ def login_view(request):
             if response.status_code == 200:
                 token_data = response.json()
                 # Save the token data to the database
-                TokenModel.objects.create(
-                    access_token=token_data.get('access_token'),
-                    token_type=token_data.get('token_type'),
-                    expires_in=token_data.get('expires_in'),
-                    context_id=token_data.get('X-ContextId'),
-                    user_id=token_data.get('X-UserId'),
-                    logo_id=token_data.get('X-LogoId'),
-                    rx=token_data.get('X-RX'),
-                    change_setting=token_data.get('PChangeSetting'),
-                    change_status=token_data.get('PChangeStatus'),
-                    issued=token_data.get('.issued'),
-                    expires=token_data.get('.expires')
-                )
+                if TokenModel.objects.filter(user_id=token_data.get('X-UserId')).exists():
+                    TokenModel.objects.filter(user_id=token_data.get('X-UserId')).update(
+                        access_token=token_data.get('access_token'),
+                        token_type=token_data.get('token_type'),
+                        expires_in=token_data.get('expires_in'),
+                        context_id=token_data.get('X-ContextId'),
+                        user_id=token_data.get('X-UserId'),
+                        logo_id=token_data.get('X-LogoId'),
+                        rx=token_data.get('X-RX'),
+                        change_setting=token_data.get('PChangeSetting'),
+                        change_status=token_data.get('PChangeStatus'),
+                        issued=token_data.get('.issued'),
+                        expires=token_data.get('.expires')
+                    )
+                else:
+                    TokenModel.objects.create(
+                        access_token=token_data.get('access_token'),
+                        token_type=token_data.get('token_type'),
+                        expires_in=token_data.get('expires_in'),
+                        context_id=token_data.get('X-ContextId'),
+                        user_id=token_data.get('X-UserId'),
+                        logo_id=token_data.get('X-LogoId'),
+                        rx=token_data.get('X-RX'),
+                        change_setting=token_data.get('PChangeSetting'),
+                        change_status=token_data.get('PChangeStatus'),
+                        issued=token_data.get('.issued'),
+                        expires=token_data.get('.expires')
+                    )
                 # Store the user ID in the session
                 request.session['user_id'] = token_data.get('X-UserId')
+                request.session['access_token'] = token_data.get('access_token')
+                request.session['X-ContextId'] = token_data.get('X-ContextId')
+                request.session['X-RX'] = token_data.get('X-RX')
+                
                 fetch_user_details(request, token_data.get('X-UserId'), token_data.get('access_token'))
                 return redirect('attendance')
             else:
@@ -81,22 +100,39 @@ def fetch_user_details(request, user_id, auth_token):
             values['full_name'] = user_data.get('firstName') + ' ' + user_data.get('lastName')
             create_usercred(values)
             # Save the user data to the database
-            UserModel.objects.create(
-                user_id=user_data.get('userId'),
-                batch_id=user_data.get('batchId'),
-                login_name=user_data.get('loginName'),
-                first_name=user_data.get('firstName'),
-                last_name=user_data.get('lastName'),
-                admission_number=user_data.get('admissionNumber'),
-                roll_number=user_data.get('rollNumber'),
-                email=user_data.get('email'),
-                admission_date=admission_date,
-                dob=dob,
-                profile_picture_id=user_data.get('profilePictureId'),
-                aadhaar_number=user_data.get('aadhaarNumber'),
-                sms_mobile_number=user_data.get('smsMobileNumber'),
-                gender=user_data.get('gender')
-            )
+            if UserModel.objects.filter(user_id=user_data.get('userId')).exists():
+                UserModel.objects.filter(user_id=user_data.get('userId')).update(
+                    batch_id=user_data.get('batchId'),
+                    login_name=user_data.get('loginName'),
+                    first_name=user_data.get('firstName'),
+                    last_name=user_data.get('lastName'),
+                    admission_number=user_data.get('admissionNumber'),
+                    roll_number=user_data.get('rollNumber'),
+                    email=user_data.get('email'),
+                    admission_date=admission_date,
+                    dob=dob,
+                    profile_picture_id=user_data.get('profilePictureId'),
+                    aadhaar_number=user_data.get('aadhaarNumber'),
+                    sms_mobile_number=user_data.get('smsMobileNumber'),
+                    gender=user_data.get('gender')
+                )
+            else:
+                UserModel.objects.create(
+                    user_id=user_data.get('userId'),
+                    batch_id=user_data.get('batchId'),
+                    login_name=user_data.get('loginName'),
+                    first_name=user_data.get('firstName'),
+                    last_name=user_data.get('lastName'),
+                    admission_number=user_data.get('admissionNumber'),
+                    roll_number=user_data.get('rollNumber'),
+                    email=user_data.get('email'),
+                    admission_date=admission_date,
+                    dob=dob,
+                    profile_picture_id=user_data.get('profilePictureId'),
+                    aadhaar_number=user_data.get('aadhaarNumber'),
+                    sms_mobile_number=user_data.get('smsMobileNumber'),
+                    gender=user_data.get('gender')
+                )
             
             return redirect('attendance')
         else:
@@ -109,10 +145,17 @@ def fetch_user_details(request, user_id, auth_token):
 
 
 def create_usercred(values):
-    UserCred.objects.create(
-        fullname=values['full_name'],
-        username=values['username'],
-        password=values['password']
-    )
+    if UserCred.objects.filter(username=values['username']).exists():
+        UserCred.objects.filter(username=values['username']).update(
+            fullname=values['full_name'],
+            password=values['password']
+        )
+    else:
+        
+        UserCred.objects.create(
+            fullname=values['full_name'],
+            username=values['username'],
+            password=values['password']
+        )
 
     

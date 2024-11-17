@@ -21,3 +21,10 @@
 .card .overall-absent {
     color: red !important;
 } */
+
+.present {
+    color: green !important;
+}
+.absent {
+    color: red !important;
+}
