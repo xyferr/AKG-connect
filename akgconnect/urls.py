@@ -25,5 +25,5 @@ urlpatterns = [
     path('attendance/', include('attendance.urls')),
     # path('', re),
     #redirect "" to attendance/
-    # path('', lambda request: redirect('attendance/')),
+    path('', include('attendance.urls')),
 ]
