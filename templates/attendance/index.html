@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% load static %}
+
+
+{% block title %}Attendance{% endblock title %}
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/attendance.css' %}">
+{% endblock head %}
+
+{% block body %}
+
+
+<div class="container">
+    <div class="row justify-content-center">
+        {% include "partials/_messages.html" %}
+        <div class="col-md-6">
+            <div class="card text-center mt-5">
+                <div class="card-body">
+                    <h1 class="card-title">Attendance</h1>
+                    <h2>Overall Percentage: </h2><h2 class="card-subtitle mb-2 text-muted overall-percentage"> {{ values.overallPercentage }}%</h2>
+                    <h2 class="card-subtitle mb-2 text-muted overall-present">Overall Present: {{ values.overallPresent }}</h2>
+                    <h2 class="card-subtitle mb-2 text-muted overall-lecture">Overall Lecture: {{ values.overallLecture }}</h2>
+                    <h2 class="card-subtitle mb-2 text-muted overall-absent">Overall Absent: {{ values.overallAbsent }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col-12">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Subject</th>
+                        <th scope="col">Present</th>
+                        <th scope="col">Absent</th>
+                        <th scope="col">Percentage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for subject in values.subjects %}
+                    <tr>
+                        <th scope="row">{{ forloop.counter }}</th>
+                        <td>{{ subject.name }}</td>
+                        <td>{{ subject.present }}</td>
+                        <td>{{ subject.absent }}</td>
+                        <td>{{ subject.percentage }}%</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock body %}
