@@ -1,7 +1,7 @@
 from django.db import models
 
 class TokenModel(models.Model):
-    access_token = models.CharField(max_length=255)
+    access_token = models.CharField(max_length=1000)
     token_type = models.CharField(max_length=50)
     expires_in = models.IntegerField()
     context_id = models.CharField(max_length=255)
