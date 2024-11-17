@@ -54,6 +54,12 @@ def Get_attendance(request):
             "overallAbsent": int(overallAbsent),
         }
         subjects = stdSubAtdDetails.get("subjects", [])
+        subIndex={
+            
+        }
+        for i in range(len(subjects)):
+            subIndex[subjects[i]["id"]]=i
+        
         attendanceData = attendance_data.get("attendanceData", [])
         computed_range = range(len(attendance_data) // len(subjects))
         stdAtdlist = []
@@ -64,46 +70,82 @@ def Get_attendance(request):
             formatted_date = parsed_date.strftime("%d-%m-%y")
             curdict['date']=formatted_date
             cur=[]
+            
             for j in range(i,i+len(subjects)):
                 
                 lbl = attendanceData[j]["attendanceLable"]
                 
+                
                 if lbl=="P":
-                    cur.append({
-                        "value":"P",
-                        "color":"present"
-                    })
+                    cur.append([("P","present")])
                 elif lbl=="A":
-                    cur.append({
-                        "value":"A",
-                        "color":"absent"
-                    })
+                    cur.append([("A","absent")])
                 elif lbl=="AC":
-                    cur.append({
-                        "value":"AC",
-                        "color":"present"
-                    })
+                    cur.append([("AC","present")])
                 else:
-                    cur.append({
-                        "value":"--",
-                        "color":None
-                    })
-               
+                    cur.append([("--",None)])
+                    
+                
                 if j==len(attendanceData):
                     break
-            curdict["label"]=cur
+            # cur.append({
+            #             "value":labelval,
+            #             "color":colorval
+            #         })
+            curdict["values"]  = cur
             stdAtdlist.append(curdict)
-        
-        # for lt in stdAtdlist:
-        #     print(lt)
-        
-        # for at in attendanceData:
-        #     print(at["absentDate"])
+        stdAtdlist.sort(key=lambda x: datetime.strptime(x["date"], "%d-%m-%y"))
+
+        extraLectures = attendance_data.get("extraLectures", [])
+        for i in range(len(extraLectures)):
+            rawdate = extraLectures[i]["absentDate"]
+            parsed_date = datetime.strptime(rawdate, "%Y-%m-%dT%H:%M:%S")
+            formatted_date = parsed_date.strftime("%d-%m-%y")
+            #here binary search to find the formatted_date in stdAtdlist
+            low = 0
+            high = len(stdAtdlist)-1
+            res = -1
+            while low<=high:
+                mid = (low+high)//2
+                d1 = dateHash(stdAtdlist[mid]["date"])
+                d2 = dateHash(formatted_date)
+                if d1==d2:
+                    res = mid
+                    break
+                elif d1<d2:
+                    low = mid+1
+                else:
+                    high = mid-1
+            if stdAtdlist[res]["date"]==formatted_date:
+                # print("found" , formatted_date)
+                
+                ind = subIndex[extraLectures[i]["subjectId"]]
+                curval = stdAtdlist[res]["values"][ind]
+                lbl = extraLectures[i]["attendanceLable"]
+
+                # Append the string lbl to whatever the current string is
+                  # Update the first element
+                if lbl == "P":
+                    curval.append(("P","present"))
+                elif lbl == "A":
+                    curval.append(("A","absent"))
+                elif lbl == "AC":
+                    curval.append(("AC","present"))
+                else:
+                    curval.append(("--",None))
+
+                # Convert back to tuple and reassign
+                stdAtdlist[res]["values"][ind] = curval
+                
+            # else:
+            #     print("not found" , formatted_date)
+                
+                
+
             
         
-        # print(subjects)
-        # for sub in subjects:
-        #     print(sub['name'])
+                
+        
         context={
             'values':values,
             'subjects':subjects,
@@ -130,3 +172,9 @@ def Get_attendance(request):
         # return HttpResponseBadRequest
         return render(request, 'attendance/index.html' , context=context)
     # return render(request, 'attendance/index.html')
+    
+    
+    
+def dateHash(date):
+    #convert the date to an integer so that it can be compared , an earlier date should be less than a later date
+    return int(date[0:2])+int(date[3:5])*30+int(date[6:])*365
