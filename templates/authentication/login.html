@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Login{% endblock title %}
+{% block title %}AKGconnect{% endblock title %}
 
 {% block head %}
 <link rel="stylesheet" href="{% static 'css/login.css' %}">
@@ -19,14 +19,14 @@
     <form method="post" action="{% url 'login' %}">
         {% csrf_token %}
      
-      <h1 class="h3 mb-3 fw-normal">Please Log in</h1>
+      <h1 class="h3 mb-3 fw-normal">Log in to AKGconnect</h1>
   
       <div class="form-floating">
-        <input type="number" class="form-control" id="floatingInput" placeholder="username" name="username" value="{{ fieldValues.username }}">
-        <label for="floatingInput">username</label>
+        <input type="text" class="form-control" id="username" placeholder="username" name="username" value="{{ fieldValues.username }}">
+        <label for="floatingInput">Edumarhsal username</label>
       </div>
       <div class="form-floating">
-        <input type="password" class="form-control" id="floatingPassword" placeholder="Password" name="password" value="{{ fieldValues.password }}">
+        <input type="password" class="form-control" id="password" placeholder="Password" name="password" value="{{ fieldValues.password }}">
         <label for="floatingPassword">Password</label>
       </div>
   
