@@ -140,7 +140,8 @@ def Get_attendance(request):
             # else:
             #     print("not found" , formatted_date)
                 
-                
+        
+        stdAtdlist = ACmapping(stdAtdlist,user_id,access_token,contextid,rx,subIndex)
 
             
         
@@ -178,3 +179,103 @@ def Get_attendance(request):
 def dateHash(date):
     #convert the date to an integer so that it can be compared , an earlier date should be less than a later date
     return int(date[0:2])+int(date[3:5])*30+int(date[6:])*365
+
+
+
+def ACmapping(stdAtdlist , user_id , access_token , contextid , rx , subIndex):
+    print("AC mapping")
+    AC_ENDPOINT = "https://akgecerp.edumarshal.com/api/StudentAttendanceEventMapping"
+    ac_url = f"{AC_ENDPOINT}?OnlyBatch=1&userId={user_id}"
+    try:
+        response = requests.get(
+            ac_url,
+            headers={
+                'Authorization': f'Bearer {access_token}',
+                'X-UserId': user_id,
+                'X-ContextId': contextid,
+                'X-RX': rx
+            }
+        )
+        if response.status_code != 200:
+            print("Failed to fetch AC data")
+            return stdAtdlist
+        ac_data = response.json()
+        new_ac_data = []
+        print("AC data fetched")
+        for data in ac_data:
+            # print(data["studentId"], " " , user_id)
+            # print(type(data["studentId"]), " " , type(user_id))
+            if data["studentId"] == int(user_id):
+                # print(data["studentId"], " " , user_id)
+                new_ac_data.append(data)
+                # print(data)
+                
+        
+
+        for data in new_ac_data:
+            # print(data)
+        
+            
+            #fir date ko apni format me convert karna hai
+            rawdate = data["eventDate"]
+            parsed_date = datetime.strptime(rawdate, "%Y-%m-%dT%H:%M:%S")
+            formatted_date = parsed_date.strftime("%d-%m-%y")
+            
+            
+            
+            #bindary search to find the current data.date
+            low = 0
+            high = len(stdAtdlist)-1
+            res = -1
+            while low<=high:
+                mid = (low+high)//2
+                d1 = dateHash(stdAtdlist[mid]["date"])
+                d2 = dateHash(formatted_date)
+                if d1==d2:
+                    res = mid
+                    break
+                elif d1<d2:
+                    low = mid+1
+                else:
+                    high = mid-1
+            
+            if stdAtdlist[res]["date"]==formatted_date:
+                ind = subIndex[data["subjectId"]]
+                data_val = data["title"]
+                sub_attendance_list = stdAtdlist[res]["values"][ind]
+                new_list = []
+                flag = 0
+                for lecture in sub_attendance_list:
+                    
+                    #convert the tuple to list
+                    lecture = list(lecture)
+                    if flag == 0 and lecture[0] == "P":
+                        lecture[0] = data_val
+                        flag = 1
+                    
+                        
+                        
+                        
+                    #convert the list to tuple
+                    lecture = tuple(lecture)
+                    new_list.append(lecture)
+                    
+                stdAtdlist[res]["values"][ind] = new_list
+        return stdAtdlist
+    except Exception as e:
+        print("AC data not fetched" , e)
+        
+    
+                
+    #debug print
+    # for i in range(len(stdAtdlist)):
+    #     print(stdAtdlist[i]["date"]," ",stdAtdlist[i]["values"])
+        
+            
+        return stdAtdlist
+                    
+                
+                
+                
+                 
+    
