@@ -54,10 +54,13 @@ def Get_attendance(request):
             "overallAbsent": int(overallAbsent),
         }
         subjects = stdSubAtdDetails.get("subjects", [])
+        # print(subjects)
+        # print(type(subjects))
         subIndex={
             
         }
         for i in range(len(subjects)):
+            change_name(subjects[i])
             subIndex[subjects[i]["id"]]=i
         
         attendanceData = attendance_data.get("attendanceData", [])
@@ -276,6 +279,25 @@ def ACmapping(stdAtdlist , user_id , access_token , contextid , rx , subIndex):
                     
                 
                 
-                
+       
+       
+def change_name(subject):
+    if subject["name"]=="DATABASE  MANAGEMENT SYSTEM":
+        subject["name"]="DBMS"  
+    elif subject["name"]=="Design and Analysis of  Algorithm":
+        subject["name"]="DAA"
+    elif subject["name"]=="Database Management System  Lab":
+        subject["name"]="DBMS lab"
+    elif subject["name"]=="Design and Analysis of Algorithm  Lab":
+        subject["name"]="DAA lab"
+    elif subject["name"]=="Artificial Intelligence_Lab":
+        subject["name"]="AI lab"
+    elif subject["name"]=="Artificial_Intelligence":
+        subject["name"]="AI"
+    elif subject["name"]=="CLOUD   COUMPTING":
+        subject["name"]="CC"
+    
+    
+    
                  
     

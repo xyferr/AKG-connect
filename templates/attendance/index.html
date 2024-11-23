@@ -27,80 +27,82 @@
     </div>
     <div class="row mt-4">
         <div class="col-12">
-            <table class="table table-striped table-bordered table-advance table-hover compacttable">
-                <thead>
-                    <tr>
-                        <th style="width: 60px;">
-                            <div style="text-align: left; padding-left: 19%; width: 55px;">Date</div>
-                        </th>
-                        <!-- ngRepeat: sub in subjects -->
-                         {% for sub in subjects %}
-                         <th ng-repeat="sub in subjects" class="ng-scope">
-                            <div style="width:100px;word-wrap: break-word;white-space: normal;" class="ng-binding">{{sub.name}}</div>
-                        </th>
-                         {% endfor %}
-                         
+           
+                <table class="table table-striped table-bordered table-advance table-hover compacttable">
+                    <thead>
+                        <tr>
+                            <th style="width: 60px;">
+                                <div style="text-align: left; padding-left: 19%; width: 55px;">Date</div>
+                            </th>
+                            <!-- ngRepeat: sub in subjects -->
+                             {% for sub in subjects %}
+                             <th ng-repeat="sub in subjects" class="ng-scope">
+                                <div style="width:100px;word-wrap: break-word;white-space: normal;" class="ng-binding">{{sub.name}}</div>
+                            </th>
+                             {% endfor %}
+                             
+                            
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Overall Percentage</td>
+                            {% for sub in subjects %}
+    
+                            <th ng-repeat="attPercentage in studentEachSubjectPercentage" ng-class="{'danger':attPercentage.percentageAttendance < 75}" class="ng-scope">{{sub.percentageAttendance}}</th>
                         
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <th>Overall Percentage</th>
-                        {% for sub in subjects %}
-
-                        <th ng-repeat="attPercentage in studentEachSubjectPercentage" ng-class="{'danger':attPercentage.percentageAttendance < 75}" class="ng-scope"><b class="ng-binding">{{sub.percentageAttendance}}</b></th>
-                    
-
-                        {% endfor %}
-                      </tr>
-                    <tr>
-                        <th>Total Present</th>
-                        {% for sub in subjects %}
-
-                                                <!-- ngRepeat: attPercentage in overall_percentage_subjectList_data --><th ng-repeat="attPercentage in overall_percentage_subjectList_data" class="ng-scope"><b class="ng-binding">{{sub.presentLeactures}}</b></th>
-                       
-                        {% endfor %}
-                    </tr>
-                    <tr>
-                        <th>Total Absent</th>
-                        {% for sub in subjects %}
-
-                                                <!-- ngRepeat: attPercentage in overall_percentage_subjectList_data --><th ng-repeat="attPercentage in overall_percentage_subjectList_data" class="ng-scope"><b class="ng-binding">{{sub.absentLeactures}}</b></th>
-                       
-                        {% endfor %}
-                    </tr>
-                    <tr>
-                        <th>Total Lecture</th>
-                        
-                        {% for sub in subjects %}
-
-                                                <!-- ngRepeat: attPercentage in overall_percentage_subjectList_data --><th ng-repeat="attPercentage in overall_percentage_subjectList_data" class="ng-scope"><b class="ng-binding">{{sub.totalLeactures}}</b></th>
-                       
-                        {% endfor %}
-                    </tr>
-                    <tr>
-                        <th colspan="11"></th>
-
-                    </tr>
-                    <!-- ngRepeat: student in studentAttendanceList | filter:searchgGlobalText -->
-                    {% for lt in stdAtdlist %}
-                        <tr style="max-height: 57px">
-                            <td style="font-weight: 600">
-                                {{ lt.date }}
-                            </td>
-
-                            {% for sub in lt.values %}
-                                <td style="font-weight: 900 !important">
-                                    {% for mark in sub %}
-                                    <span class="{{ mark.1 }}">{{ mark.0 }}</span>
-                                    {% endfor %}
-                                </td>
-                                
+    
+                            {% endfor %}
+                          </tr>
+                        <tr>
+                            <td>Total Present</td>
+                            {% for sub in subjects %}
+    
+                                                    <!-- ngRepeat: attPercentage in overall_percentage_subjectList_data --><th ng-repeat="attPercentage in overall_percentage_subjectList_data" class="ng-scope">{{sub.presentLeactures}}</th>
+                           
                             {% endfor %}
                         </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                        <tr>
+                            <td>Total Absent</td>
+                            {% for sub in subjects %}
+    
+                                                    <!-- ngRepeat: attPercentage in overall_percentage_subjectList_data --><th ng-repeat="attPercentage in overall_percentage_subjectList_data" class="ng-scope">{{sub.absentLeactures}}</th>
+                           
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td>Total Lecture</td>
+                            
+                            {% for sub in subjects %}
+    
+                                                    <!-- ngRepeat: attPercentage in overall_percentage_subjectList_data --><th ng-repeat="attPercentage in overall_percentage_subjectList_data" class="ng-scope">{{sub.totalLeactures}}</th>
+                           
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <th colspan="11"></th>
+    
+                        </tr>
+                        <!-- ngRepeat: student in studentAttendanceList | filter:searchgGlobalText -->
+                        {% for lt in stdAtdlist %}
+                            <tr style="max-height: 57px">
+                                <td style="font-weight: 600">
+                                    {{ lt.date }}
+                                </td>
+    
+                                {% for sub in lt.values %}
+                                    <td style="font-weight: 900 !important">
+                                        {% for mark in sub %}
+                                        <span class="{{ mark.1 }}">{{ mark.0 }}</span>
+                                        {% endfor %}
+                                    </td>
+                                    
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+        
         </div>
     </div>
 </div>
