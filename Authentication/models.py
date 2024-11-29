@@ -12,6 +12,7 @@ class TokenModel(models.Model):
     change_status = models.CharField(max_length=255)
     issued = models.CharField(max_length=255)
     expires = models.CharField(max_length=255)
+    x_token = models.CharField(max_length=1000,null=True,blank=True)
 
     def __str__(self):
         return self.user_id

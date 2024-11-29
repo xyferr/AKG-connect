@@ -298,6 +298,95 @@ def change_name(subject):
         subject["name"]="CC"
     
     
+
+PDP_ENDPOINT="https://akgecerp.edumarshal.com/api/TransportAttendanceReport"
+from Authentication.models import TokenModel,UserModel
+def get_pdp_attendance(request):
+    
+    try:
+        if not request.session.get('user_id'):
+            messages.error(request, 'You are not logged in Clear your cookies/cache and login again')
+            return render(request, 'authentication/login.html')
+        
+        user_id = request.session.get('user_id')
+        access_token = request.session.get('access_token')
+        contextid = request.session.get('X-ContextId')
+        rx = request.session.get('X-RX')
+        if not request.session.get('X_token'):
+            #yaha pe pahle database me se X_token fetch kar lenge user_id ke basis pe fir use session me save kar denge
+            
+            token_data = TokenModel.objects.get(user_id=user_id)
+            user_data = UserModel.objects.get(user_id=user_id)
+            x_token = token_data.x_token
+            admission_number = user_data.admission_number
+            request.session['admission_number'] = admission_number
+            request.session['X_token'] = x_token
+        x_token = request.session.get('X_token')
+        admission_number = request.session.get('admission_number')
+        pdp_url = f"{PDP_ENDPOINT}?admissionNumber={admission_number}&type=7"
+        response = requests.get(
+            pdp_url,
+            headers={
+                'Authorization': f'Bearer {access_token}',
+                'X-UserId': user_id,
+                'X-ContextId': contextid,
+                'X-RX': rx,
+                'X-Token': x_token
+            }
+        )
+        if response.status_code != 200:
+            messages.error(request, 'Failed to fetch PDP attendance data')
+            return HttpResponseBadRequest
+        pdp_data = response.json()
+        values = []
+        for i in range(0,len(pdp_data),2):
+            cur={
+                
+            }
+            att = []
+            date = pdp_data[i]["attendanceDate"]
+            date = datetime.strptime(date, "%Y-%m-%dT%H:%M:%S")
+            date = date.strftime("%d-%m-%y")
+            cur["date"] = date
+            # print(type(pdp_data[i]["isInAbsent"]))
+            if pdp_data[i]["isInAbsent"]==True:
+                att.append(("A","absent"))
+            else:
+                att.append(("P","present"))
+                
+                
+            if pdp_data[i+1]["isInAbsent"]==True:
+                att.append(("A","absent"))
+            else:
+                att.append(("P","present"))
+            cur["label"] = att
+            values.append(cur)
+        
+        totallectures=0
+        totalpresent=0
+        for it in values:
+            for label in it["label"]:
+                totallectures+=1
+                if label[0]=="P":
+                    totalpresent+=1
+        totalabsent=totallectures-totalpresent
+        Overallpercentage = int((totalpresent/totallectures)*100)
+        context={
+            "values":values,
+            "totallectures":totallectures,
+            "totalpresent":totalpresent,
+            "totalabsent":totalabsent,
+            "Overallpercentage":Overallpercentage
+        }
+        
+        return render(request, 'attendance/pdp.html', context=context)
+    
+    except Exception as e:
+        messages.error(request, str(e))
+        print("data not fetched" , e)
+        return render(request, 'attendance/pdp.html')
+        
+       
     
                  
     

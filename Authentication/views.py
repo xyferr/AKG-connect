@@ -50,7 +50,8 @@ def login_view(request):
                         change_setting=token_data.get('PChangeSetting'),
                         change_status=token_data.get('PChangeStatus'),
                         issued=token_data.get('.issued'),
-                        expires=token_data.get('.expires')
+                        expires=token_data.get('.expires'),
+                        x_token = token_data.get('X_Token')
                     )
                 else:
                     TokenModel.objects.create(
@@ -64,13 +65,16 @@ def login_view(request):
                         change_setting=token_data.get('PChangeSetting'),
                         change_status=token_data.get('PChangeStatus'),
                         issued=token_data.get('.issued'),
-                        expires=token_data.get('.expires')
+                        expires=token_data.get('.expires'),
+                        x_token = token_data.get('X_Token')
+                        
                     )
                 # Store the user ID in the session
                 request.session['user_id'] = token_data.get('X-UserId')
                 request.session['access_token'] = token_data.get('access_token')
                 request.session['X-ContextId'] = token_data.get('X-ContextId')
                 request.session['X-RX'] = token_data.get('X-RX')
+                request.session['X_token'] = token_data.get('X_Token')
                 
                 fetch_user_details(request, token_data.get('X-UserId'), token_data.get('access_token'))
                 return redirect('attendance')
@@ -116,6 +120,8 @@ def fetch_user_details(request, user_id, auth_token):
                     sms_mobile_number=user_data.get('smsMobileNumber'),
                     gender=user_data.get('gender')
                 )
+                admission_number = user_data.get('admissionNumber')
+                request.session['admission_number'] = admission_number
             else:
                 UserModel.objects.create(
                     user_id=user_data.get('userId'),
@@ -133,6 +139,8 @@ def fetch_user_details(request, user_id, auth_token):
                     sms_mobile_number=user_data.get('smsMobileNumber'),
                     gender=user_data.get('gender')
                 )
+                admission_number = user_data.get('admissionNumber')
+                request.session['admission_number'] = admission_number
             
             return redirect('attendance')
         else:
@@ -158,4 +166,35 @@ def create_usercred(values):
             password=values['password']
         )
 
-    
+
+#Since i have added one more field to my token model that is X_token , i will contruct a function that input username and passwords from usercred model and update the token model of every user so that X_token field is fetched again
+def fetch_xtoken():
+    for user in UserCred.objects.all():
+        try:
+            response = requests.post(
+                TOKEN_ENDPOINT,
+                data={
+                    'grant_type': 'password',
+                    'username': user.username,
+                    'password': user.password,
+                    'remember': 'true',
+                },
+                headers={'Content-Type': 'application/x-www-form-urlencoded'}
+            )
+
+            if response.status_code == 200:
+                token_data = response.json()
+                # Save the token data to the database
+                if TokenModel.objects.filter(user_id=token_data.get('X-UserId')).exists():
+                    TokenModel.objects.filter(user_id=token_data.get('X-UserId')).update(
+                        x_token = token_data.get('X_Token')
+                    )
+                else:
+                    TokenModel.objects.create(
+                        x_token = token_data.get('X_Token')
+                    )
+            else:
+                print('Failed! Please check your credentials again.')
+        except Exception as e:
+            print(str(e))
+    print("X_Token fetched successfully")

@@ -36,3 +36,8 @@
     transition: 0.3s !important;
 
 }
+
+.btn{
+    margin-left: center !important;
+    margin-bottom: 40px !important;
+  }

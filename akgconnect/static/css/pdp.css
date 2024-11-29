@@ -1,0 +1,27 @@
+.present {
+    color: green !important;
+}
+.absent {
+    color: red !important;
+}
+.table{
+    /* margin: 10px !important; */
+    /* padding: 10px !important; */
+    border-radius: 10px !important;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2) !important;
+    transition: 0.3s !important;
+
+}
+.page-title{
+    align-items: center !important;
+    justify-content: center !important;
+    display: flex !important;
+    /* margin: 10px !important; */
+    margin-top: 30px !important;
+    margin-bottom: 20px !important;
+    padding: 20px !important;
+    border-radius: 10px !important;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2) !important;
+    transition: 0.3s !important;
+    
+}

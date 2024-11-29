@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/pdp.css' %}">
+{% endblock head %}
+
+{% block body %}
+<div class="container">
+    <div class="row">
+        <h2 class="page-title">PDP Attendance</h2>
+        
+        
+    </div>
+    <div class="row">
+        <table class="table table-striped table-bordered table-advance table-hover compacttable">
+            <tr>
+                <td>
+                    Overall Percentage
+                </td>
+                    
+                <td>
+                    {{Overallpercentage}}%
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Total Lectures
+                </td>
+                    
+                <td>
+                    {{totallectures}}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Total Present
+                </td>
+                    
+                <td>
+                    {{totalpresent}}
+                </td>
+            </tr>
+            <tr>
+                <th>Date</th>
+                <th>Attendance</th>
+            </tr>
+            {% for each in values %}
+            <tr>
+                <td>{{ each.date }}</td>
+                
+                <td style="font-weight: 900 !important">
+                    {% for mark in each.label %}
+                    <span class="{{ mark.1 }}">{{ mark.0 }}</span>
+                    {% endfor %}
+                </td>
+                
+                
+            </tr>
+            {% endfor %}
+
+
+        </table>
+    </div>
+</div>
+
+{% endblock body %}
