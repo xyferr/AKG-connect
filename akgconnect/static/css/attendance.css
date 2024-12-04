@@ -6,6 +6,13 @@
     transition: 0.3s;
 }
 
+.attcard{
+    margin: 10px auto !important;
+    display:flex !important;
+    
+    
+}
+
 .card .overall-percentage {
     color: green !important;
 }
